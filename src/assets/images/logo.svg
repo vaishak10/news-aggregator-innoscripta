@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200">
+  <rect width="400" height="200" rx="15" ry="15" fill="#f0f6ff" />
+  <rect x="25" y="25" width="350" height="150" rx="10" ry="10" fill="#004080" />
+  <text x="60" y="115" font-family="Arial, sans-serif" font-weight="bold" font-size="55" fill="#ffffff">YES</text>
+  <text x="190" y="115" font-family="Arial, sans-serif" font-weight="bold" font-size="55" fill="#ff9500">NEWS!</text>
+</svg>

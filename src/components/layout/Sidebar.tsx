@@ -15,6 +15,7 @@ import {
   Settings as SettingsIcon,
 } from '@mui/icons-material';
 import { useLocation, useNavigate } from 'react-router-dom';
+import logo from '../../assets/images/logo.svg';
 
 interface SidebarProps {
   open: boolean;
@@ -36,7 +37,17 @@ const Sidebar = ({ open, onClose }: SidebarProps) => {
   const navigate = useNavigate();
 
   const drawer = (
-    <Box sx={{ mt: 8 }}>
+    <Box sx={{ mt: 1 }}>
+      <img 
+        src={logo} 
+        alt="Yes News!" 
+        style={{
+          width: '225px',
+          height: '72px',
+          objectFit: 'contain',
+          marginBottom: '16px'
+        }}
+      />
       <List>
         {menuItems.map((item) => (
           <ListItem key={item.text} disablePadding>

@@ -1,16 +1,18 @@
 import { AppBar, Toolbar, IconButton, InputBase, Box, useTheme, useMediaQuery } from '@mui/material';
 import { Menu as MenuIcon, Search as SearchIcon } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
+import { useState } from 'react';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
   borderRadius: theme.shape.borderRadius,
-  backgroundColor: 'rgba(255, 255, 255, 0.15)',
+  backgroundColor: 'rgba(255, 255, 255)',
   '&:hover': {
-    backgroundColor: 'rgba(255, 255, 255, 0.25)',
+    backgroundColor: 'rgb(231 228 228 / 42%)',
   },
   marginRight: theme.spacing(2),
   marginLeft: 0,
+  paddingLeft: '16px',
   width: '100%',
   [theme.breakpoints.up('sm')]: {
     marginLeft: theme.spacing(3),
@@ -25,10 +27,17 @@ interface HeaderProps {
 
 const Header = ({ onMenuClick, onSearch }: HeaderProps) => {
   const theme = useTheme();
+  const [searchText, setSearchText] = useState('');
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const searchTerm = e.target.value;
+    onSearch(searchTerm);
+    setSearchText(searchTerm)
+  };
+
   return (
-    <AppBar position="fixed" color="default" elevation={1} className='header'>
+    <AppBar position="fixed" sx={{ backgroundColor: '#ffffff' }} elevation={1} className='header'>
       <Toolbar>
         <IconButton
           edge="start"
@@ -39,14 +48,14 @@ const Header = ({ onMenuClick, onSearch }: HeaderProps) => {
         >
           <MenuIcon />
         </IconButton>
-        <Box sx={{ flexGrow: 1 }}>
-          <Search>
+        <Box sx={{ flexGrow: 1, display: "flex", placeContent: "end" }}>
+          <Search 
+          >
             <InputBase
-              placeholder="Search news..."
-              onChange={(e) => onSearch(e.target.value)}
-              //sx={{ ml: 2, flex: 1, color: 'inherit', width: '100%' }}
+              placeholder="Search News..."
+              onChange={handleSearch}
             />
-            <IconButton sx={{ p: 1 }} aria-label="search">
+            <IconButton sx={{ p: 1 }} aria-label="search" onClick={() => onSearch(searchText)}>
               <SearchIcon />
             </IconButton>
           </Search>

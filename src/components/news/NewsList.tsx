@@ -1,4 +1,6 @@
 import { Grid, Box, Typography, CircularProgress } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import { Article } from '../../types/news';
 import NewsCard from './NewsCard';
 
@@ -19,6 +21,9 @@ const NewsList = ({
   onBookmarkToggle,
   bookmarkedArticles,
 }: NewsListProps) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
   if (isLoading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
@@ -29,9 +34,9 @@ const NewsList = ({
 
   if (error) {
     return (
-      <Box sx={{ p: 3 }}>
-        <Typography color="error">Error loading articles: {error.message}</Typography>
-      </Box>
+      <Typography color="error" sx={{ p: 2 }}>
+        {error.message}
+      </Typography>
     );
   }
 
@@ -44,9 +49,9 @@ const NewsList = ({
   }
 
   return (
-    <Grid container spacing={3} sx={{ p: 3, ml: -6.5 }}>
+    <Grid container spacing={isMobile ? 2 : 3}>
       {articles.map((article) => (
-        <Grid item xs={12} sm={6} md={4} lg={3} key={article.id}>
+        <Grid item key={article.id} xs={12} sm={6} md={4} lg={3}>
           <NewsCard
             article={article}
             isBookmarked={bookmarkedArticles.has(article.id)}

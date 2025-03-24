@@ -11,6 +11,9 @@ import {
 import { BookmarkBorder, Bookmark } from '@mui/icons-material';
 import { format } from 'date-fns';
 import { Article } from '../../types/news';
+import { useTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import fallbackImage from '../../assets/images/News-icon.png';
 
 interface NewsCardProps {
   article: Article;
@@ -20,22 +23,34 @@ interface NewsCardProps {
 }
 
 const NewsCard = ({ article, isBookmarked, onBookmarkToggle, onClick }: NewsCardProps) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const { title, description, imageUrl, source, category, publishedAt } = article;
 
   return (
-    <Card sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+    <Card sx={{ 
+      display: 'flex', 
+      flexDirection: 'column', 
+      height: '100%',
+      margin: isMobile ? '8px 0' : 0
+    }}>
       <CardActionArea onClick={onClick}>
-        {imageUrl && (
+        {
           <CardMedia
             component="img"
-            height="140"
-            image={imageUrl}
+            height={isMobile ? "200" : "140"}
+            image={imageUrl ?? fallbackImage}
             alt={title}
             sx={{ objectFit: 'cover' }}
           />
-        )}
-        <CardContent>
-          <Typography gutterBottom variant="h6" component="h2" noWrap>
+        }
+        <CardContent sx={{ p: isMobile ? 1.5 : 2 }}>
+          <Typography 
+            gutterBottom 
+            variant={isMobile ? "subtitle1" : "h6"} 
+            component="h2" 
+            noWrap
+          >
             {title}
           </Typography>
           <Typography
@@ -45,7 +60,7 @@ const NewsCard = ({ article, isBookmarked, onBookmarkToggle, onClick }: NewsCard
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               display: '-webkit-box',
-              WebkitLineClamp: 2,
+              WebkitLineClamp: isMobile ? 3 : 2,
               WebkitBoxOrient: 'vertical',
             }}
           >
@@ -53,17 +68,40 @@ const NewsCard = ({ article, isBookmarked, onBookmarkToggle, onClick }: NewsCard
           </Typography>
         </CardContent>
       </CardActionArea>
-      <Box sx={{ p: 2, mt: 'auto' }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Box>
-            <Chip label={source} size="small" sx={{ mr: 1 }} />
-            <Chip label={category} size="small" color="primary" />
+      <Box sx={{ p: isMobile ? 1 : 2, mt: 'auto' }}>
+        <Box sx={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center',
+          flexDirection: isMobile ? 'column' : 'row',
+          gap: isMobile ? 1 : 0
+        }}>
+          <Box sx={{ 
+            display: 'flex', 
+            gap: 1, 
+            flexWrap: 'wrap',
+            justifyContent: isMobile ? 'center' : 'flex-start',
+            width: isMobile ? '100%' : 'auto'
+          }}>
+            <Chip label={source} size={isMobile ? "small" : "medium"} />
+            <Chip label={category} size={isMobile ? "small" : "medium"} color="primary" />
           </Box>
-          <IconButton onClick={onBookmarkToggle}>
+          <IconButton 
+            onClick={onBookmarkToggle}
+            size={isMobile ? "small" : "medium"}
+          >
             {isBookmarked ? <Bookmark color="primary" /> : <BookmarkBorder />}
           </IconButton>
         </Box>
-        <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+        <Typography 
+          variant="caption" 
+          color="text.secondary" 
+          sx={{ 
+            mt: 1, 
+            display: 'block',
+            textAlign: isMobile ? 'center' : 'left'
+          }}
+        >
           {format(new Date(publishedAt), 'MMM dd, yyyy')}
         </Typography>
       </Box>

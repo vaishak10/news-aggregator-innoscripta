@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Container, Typography } from '@mui/material';
+import { Container, Typography, Alert, AlertTitle } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import NewsList from '../components/news/NewsList';
 import NewsFilters from '../components/news/NewsFilters';
@@ -11,23 +11,43 @@ import { fetchNYTimesNews } from '../services/newyorktimes';
 const Home = () => {
   const [filters, setFilters] = useState<NewsFiltersType>({});
   const [bookmarkedArticles] = useState<Set<string>>(new Set());
+  const [apiErrors, setApiErrors] = useState<Record<string, string>>({});
   
   const { data, isLoading, error } = useQuery({
     queryKey: ['news', filters],
     queryFn: async () => {
-      if (!filters?.source || filters?.source === 'All') {
-        const [newsApiData, guardianData, nyTimesData] = await Promise.all([
+      if (filters?.search || !filters?.source || filters?.source === 'All') {
+        setApiErrors({});
+        
+        const results = await Promise.allSettled([
           fetchNewsApi(filters),
           fetchGuardianNews(filters),
           fetchNYTimesNews(filters)
         ]);
-        return {
-          articles: [
-            ...newsApiData.articles,
-            ...guardianData.articles, 
-            ...nyTimesData.articles
-          ]
-        };
+        
+        const [newsApiResult, guardianResult, nytResult] = results;
+        
+        const newErrors: Record<string, string> = {};
+        
+        if (newsApiResult.status === 'rejected') {
+          newErrors['NewsAPI'] = newsApiResult.reason?.message || 'Failed to fetch from NewsAPI';
+        }
+        if (guardianResult.status === 'rejected') {
+          newErrors['The Guardian'] = guardianResult.reason?.message || 'Failed to fetch from The Guardian';
+        }
+        if (nytResult.status === 'rejected') {
+          newErrors['New York Times'] = nytResult.reason?.message || 'Failed to fetch from New York Times';
+        }
+        
+        setApiErrors(newErrors);
+
+        const articles = [
+          ...(newsApiResult.status === 'fulfilled' ? newsApiResult.value.articles : []),
+          ...(guardianResult.status === 'fulfilled' ? guardianResult.value.articles : []),
+          ...(nytResult.status === 'fulfilled' ? nytResult.value.articles : [])
+        ];
+
+        return { articles };
       } else if (filters.source === 'NewsAPI') {
         return fetchNewsApi(filters);
       } else if (filters.source === 'The Guardian') {
@@ -40,11 +60,29 @@ const Home = () => {
   });
 
   return (
-    <Container maxWidth="xl">
+    <Container>
       <Typography variant="h4" sx={{ mb: 3, color: '#000000' }}>
         Latest News
       </Typography>
       
+      {Object.entries(apiErrors).map(([source, errorMessage]) => (
+        <Alert 
+          severity="warning" 
+          sx={{ mb: 2 }}
+          key={source}
+          onClose={() => {
+            setApiErrors(prev => {
+              const newErrors = { ...prev };
+              delete newErrors[source];
+              return newErrors;
+            });
+          }}
+        >
+          <AlertTitle>{source} Error</AlertTitle>
+          {errorMessage}
+        </Alert>
+      ))}
+
       <NewsFilters
         filters={filters}
         onFiltersChange={setFilters}
