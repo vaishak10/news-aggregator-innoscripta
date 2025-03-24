@@ -2,6 +2,11 @@
 
 A modern news aggregator built with React, TypeScript, and Vite that pulls articles from multiple sources including NewsAPI, The Guardian, and The New York Times.
 
+## Preview
+
+![News Aggregator Preview](src/assets/images/home.png)
+
+
 ## Features
 
 - Multi-source news aggregation

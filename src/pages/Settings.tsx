@@ -1,9 +1,8 @@
-import { Container, Typography, Card, CardContent, Switch, FormControlLabel, Box } from '@mui/material';
+import { Container, Typography, Card, CardContent, Switch, FormControlLabel } from '@mui/material';
 import { useState } from 'react';
 
 const Settings = () => {
   const [darkMode, setDarkMode] = useState(false);
-  const [notifications, setNotifications] = useState(true);
   const [autoRefresh, setAutoRefresh] = useState(false);
 
   return (

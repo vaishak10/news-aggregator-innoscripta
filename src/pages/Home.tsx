@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Container, Typography, Alert, AlertTitle } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import NewsList from '../components/news/NewsList';
@@ -9,10 +10,21 @@ import { fetchGuardianNews } from '../services/guardian';
 import { fetchNYTimesNews } from '../services/newyorktimes';
 
 const Home = () => {
-  const [filters, setFilters] = useState<NewsFiltersType>({});
+  const [searchParams] = useSearchParams();
+  const [filters, setFilters] = useState<NewsFiltersType>({
+    search: searchParams.get('search') || ''
+  });
   const [bookmarkedArticles] = useState<Set<string>>(new Set());
   const [apiErrors, setApiErrors] = useState<Record<string, string>>({});
   
+  useEffect(() => {
+    const searchTerm = searchParams.get('search');
+    setFilters(prev => ({
+      ...prev,
+      search: searchTerm || ''
+    }));
+  }, [searchParams]);
+
   const { data, isLoading, error } = useQuery({
     queryKey: ['news', filters],
     queryFn: async () => {

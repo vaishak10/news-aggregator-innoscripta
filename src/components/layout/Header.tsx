@@ -1,7 +1,8 @@
-import { AppBar, Toolbar, IconButton, InputBase, Box, useTheme, useMediaQuery } from '@mui/material';
+import { AppBar, Toolbar, IconButton, InputBase, Box } from '@mui/material';
 import { Menu as MenuIcon, Search as SearchIcon } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 import { useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -22,18 +23,30 @@ const Search = styled('div')(({ theme }) => ({
 
 interface HeaderProps {
   onMenuClick: () => void;
-  onSearch: (query: string) => void;
 }
 
-const Header = ({ onMenuClick, onSearch }: HeaderProps) => {
-  const theme = useTheme();
-  const [searchText, setSearchText] = useState('');
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+const Header = ({ onMenuClick }: HeaderProps) => {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const [searchText, setSearchText] = useState(searchParams.get('search') || '');
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const searchTerm = e.target.value;
-    onSearch(searchTerm);
-    setSearchText(searchTerm)
+    setSearchText(searchTerm);
+  };
+
+  const handleSearchClick = () => {
+    if (searchText) {
+      navigate(`/?search=${encodeURIComponent(searchText)}`);
+    } else {
+      navigate('/');
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSearchClick();
+    }
   };
 
   return (
@@ -49,13 +62,18 @@ const Header = ({ onMenuClick, onSearch }: HeaderProps) => {
           <MenuIcon />
         </IconButton>
         <Box sx={{ flexGrow: 1, display: "flex", placeContent: "end" }}>
-          <Search 
-          >
+          <Search>
             <InputBase
               placeholder="Search News..."
               onChange={handleSearch}
+              onKeyDown={handleKeyPress}
+              value={searchText}
             />
-            <IconButton sx={{ p: 1 }} aria-label="search" onClick={() => onSearch(searchText)}>
+            <IconButton 
+              sx={{ p: 1 }} 
+              aria-label="search" 
+              onClick={handleSearchClick}
+            >
               <SearchIcon />
             </IconButton>
           </Search>
